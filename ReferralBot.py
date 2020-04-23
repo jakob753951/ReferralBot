@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime
 import discord
 from discord.ext import commands
+from discord.utils import get
 from configuration import configuration, load_config
 
 
@@ -39,14 +40,16 @@ async def on_message(message):
 async def referrals(ctx):
 	d = {}
 	invites = await ctx.guild.invites()
-
+	
 	for invite in invites:
 		if invite.inviter not in d:
 			d[invite.inviter] = 0
-		
 		d[invite.inviter] += invite.uses
 	
 	for user, referrals in d.items():
+		for level, role_id in cfg.referral_levels.items():
+			if referrals >= int(level):
+				await ctx.guild.get_member(user.id).add_roles(get(ctx.guild.roles, id=role_id))
 		await ctx.send(f'{user.mention}: {referrals}')
 
 bot.run(cfg.token)
