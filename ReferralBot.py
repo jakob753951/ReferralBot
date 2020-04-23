@@ -35,6 +35,18 @@ async def on_message(message):
 			log(f'{str(message.guild)}>{str(message.channel)}>{str(message.author)}: "{message.content}"')
 	await bot.process_commands(message)
 
+@bot.command()
+async def referrals(ctx):
+	d = {}
+	invites = await ctx.guild.invites()
 
+	for invite in invites:
+		if invite.inviter not in d:
+			d[invite.inviter] = 0
+		
+		d[invite.inviter] += invite.uses
+	
+	for user, referrals in d.items():
+		await ctx.send(f'{user.mention}: {referrals}')
 
-bot.run(cfg.token)  
+bot.run(cfg.token)
